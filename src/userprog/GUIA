@@ -1,0 +1,43 @@
+[12:12 AM, 6/17/2017] Kamil S: lib/syscall-nr.h
+	Agregar valor de enum, SYS_X
+
+lib/user/syscall.c
+	agregar funcion call(params) y llamar con los syscall#(SYS_X);
+
+lib/user/syscall.h
+	agregar prototipo call(params)
+
+userprog/syscall.c
+	agregar case, case SYS_X: { f->eax = sys_x(params); break; }
+
+	tambien crear funcion en si abajo de System Call Implementations, sys_x(params)
+
+Para Usar:
+	#include <syscall.h>
+
+	call(params);
+[12:12 AM, 6/17/2017] Kamil S: Les toca, busquen procesos :v
+[1:42 AM, 6/17/2017] Kamil S: pintos -k -T 60 --qemu  --filesys-size=2 -p ../../examples/insult -a insult -- -q  -f run insult
+[3:38 PM, 6/17/2017] Kamil S: Crear Disco:
+
+
+../../utils/pintos-mkdisk myfile.dsk --filesys-size=5 &&
+../../utils/pintos --qemu --disk=myfile.dsk -- -f -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/bounded -a bounded -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/consumerB -a consumerB -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/producer -a producer -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -- -q run bounded
+
+
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/bounded -a bounded -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/consumerB -a consumerB -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/producer -a producer -- -q &&
+
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/book -a book -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/writer -a writer -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/reader -a reader -- -q &&
+
+
+
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/diner -a diner -- -q &&
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/philosopher -a philosopher -- -q &&

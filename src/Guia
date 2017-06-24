@@ -1,0 +1,38 @@
+Para agregar un syscall                        
+ lib/syscall-nr.h 
+	Agregar valor de enum, SYS_X
+
+lib/user/syscall.c
+	agregar funcion call(params) y llamar con los syscall#(SYS_X);
+
+lib/user/syscall.h
+	agregar prototipo call(params)
+PROGS = cat cmp cp echo halt hex-dump ls mcat mcp mkdir pwd rm shell \
+	bubsort insult lineup matmult recursor printtest calltest
+
+userprog/syscall.c
+	agregar case, case SYS_X: { f->eax = sys_x(params); break; }
+
+	tambien crear funcion en si abajo de System Call Implementations, sys_x(params)
+
+Para Usar:
+	#include <syscall.h>
+
+	call(params);                        
+Les toca, busquen procesos :v                        
+pintos -k -T 60 --qemu  --filesys-size=2 -p ../../examples/insult -a insult -- -q  -f run insult                        
+Crear Disco:
+../../utils/pintos-mkdisk myfile.dsk --filesys-size=5 
+
+Formatear:                        
+../../utils/pintos --qemu --disk=myfile.dsk -- -f -q
+
+Meter cosas:
+../../utils/pintos --qemu --disk=myfile.dsk -p ../../examples/caller -a caller -- -q
+
+Correr:
+../../utils/pintos --qemu --disk=myfile.dsk -- -q run caller              
+
+
+Todo eso dentro de userprog                        
+userprog/build*                        

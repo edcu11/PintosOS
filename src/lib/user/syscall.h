@@ -34,6 +34,11 @@ void seek (int fd, unsigned position);
 unsigned tell (int fd);
 void close (int fd);
 
+int esys_semInit(int value);
+int esys_semWait(int semaphoreId);
+int esys_semPost(int semaphoreId);
+int esys_Reader(int operation);
+
 /* Project 3 and optionally project 4. */
 mapid_t mmap (int fd, void *addr);
 void munmap (mapid_t);

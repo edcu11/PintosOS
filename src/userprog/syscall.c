@@ -41,6 +41,11 @@ void sys_exit (int);
 pid_t sys_exec (const char *cmdline);
 int sys_wait (pid_t pid);
 
+int sys_semInit (int value);
+int sys_semWait(int semaphoreId);
+int sys_semPost(int semaphoreId);
+int sys_Reader(int Operation);
+
 bool sys_create(const char* filename, unsigned initial_size);
 bool sys_remove(const char* filename);
 int sys_open(const char* file);
@@ -70,6 +75,11 @@ int sys_inumber(int fd);
 #endif
 
 struct lock filesys_lock;
+//mio
+static struct semaphore wait_sema[10];
+static int usedSemaphores;
+static int reader_count;
+static struct lock waiting[10];
 
 void
 syscall_init (void)
@@ -204,7 +214,7 @@ syscall_handler (struct intr_frame *f)
       break;
     }
 
-  case SYS_WRITE: // 9
+  case SYS_WRITE: // 9esys_semWait
     {
       int fd, return_code;
       const void *buffer;
@@ -335,6 +345,39 @@ syscall_handler (struct intr_frame *f)
       break;
     }
 
+  case SYS_SEMINIT: //20 MIO
+  {
+      int value;
+      memread_user(f->esp + 4, &value, sizeof(value));
+      f->eax = sys_semInit(value);
+    break;
+  }
+
+  case SYS_SEMWAIT: //21
+  {
+      int semaphoreId;
+      memread_user(f->esp + 4, &semaphoreId, sizeof(semaphoreId));
+      f->eax = sys_semWait(semaphoreId);
+      break;
+  }
+
+  case SYS_SEMPOST: //21
+  {
+      int semaphoreId;
+      memread_user(f->esp + 4, &semaphoreId, sizeof(semaphoreId));
+      f->eax = sys_semPost(semaphoreId);
+      break;
+  }
+
+  case SYS_READER: //22
+  {
+      int operation;
+      memread_user(f->esp + 4, &operation, sizeof(operation));
+      f->eax = sys_Reader(operation);
+      break;
+  }
+
+
 #endif
 
 
@@ -355,7 +398,61 @@ void sys_halt(void) {
   shutdown_power_off();
 }
 
-void sys_exit(int status) {
+int sys_semInit(int value)
+{
+
+  sema_init (&wait_sema[usedSemaphores], value);
+ // printf("Semaforo Inicializado: %d \n ", usedSemaphores);
+  return usedSemaphores++;
+}
+
+
+
+int sys_semWait(int semaphoreId)
+{
+
+ // printf("waiting I suppose \n");
+  sema_down(&wait_sema[semaphoreId]);
+
+ // printf(" ended waiting in wait %d \n", semaphoreId);
+  return 1;
+
+}
+
+int sys_semPost(int semaphoreId)
+{
+
+ // printf("entered post \n");
+  sema_up(&wait_sema[semaphoreId]);
+  /*if(intr_get_level () == INTR_ON)
+  {
+    printf("encendidas en post \n");
+    timer_msleep(5);
+  }
+  printf("turned off en post\n");*/   
+ // thread_sleep_until(48);
+  printf("finished waiting in post %d, value now: %d \n", semaphoreId, wait_sema[semaphoreId].value);
+  return 1;
+
+}
+
+int sys_Reader(int operation)
+{
+  printf("reading in kernel \n");
+  if(operation == 1)
+  {
+    reader_count = reader_count + 1;
+    return reader_count;
+  }
+  else if(operation == 2)
+  {
+    reader_count = reader_count - 1;
+    return reader_count;
+  }
+  return 2;
+}
+
+void sys_exit(int status)  {
   printf("%s: exit(%d)\n", thread_current()->name, status);
 
   // The process exits.
